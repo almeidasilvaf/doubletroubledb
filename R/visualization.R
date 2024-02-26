@@ -23,7 +23,7 @@ plot_tree <- function(tree, metadata, taxon, min_n = 2) {
         select(all_of(c("species", "Taxon", "ncbi_species")))
     
     ## ## Plot species tree tips colored by taxon
-    p_tree <- ggtree(tree, branch.length = "none")
+    p_tree <- ggtree::ggtree(tree, branch.length = "none")
     tree_meta <- p_tree$data |>
         inner_join(meta, by = c("label" = "species")) |>
         mutate(
