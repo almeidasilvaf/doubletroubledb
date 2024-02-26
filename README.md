@@ -5,7 +5,7 @@
 This repository contains a Quarto dashboard to explore and download data
 associated with the publication describing the **doubletrouble** R package.
 
-Data includes the complete set of duplicated gene pairs and genes
+Data include the complete set of duplicated gene pairs and genes
 for >800 species on Ensembl (release 110) and Ensembl Genomes (Plants,
 Fungi, Metazoa, and Protists; release 57).
 
