@@ -1,0 +1,134 @@
+---
+execute: 
+  echo: true
+  eval: false
+  warning: false
+embed-resources: true
+format: markdown_github
+---
+
+# urls.rda
+
+Here, I will describe how I created the file `urls.rda`, which contains
+URLs to files on FigShare with all duplicate pairs and genes. Data
+are available in the following pages:
+
+1. [Ensembl Fungi](https://figshare.com/articles/dataset/doubletroubledb_data_-_Ensembl_Fungi/25222052)
+2. [Ensembl Metazoa](https://figshare.com/articles/dataset/doubletroubledb_data_-_Ensembl_Metazoa/25222061)
+3. [Ensembl Plants](https://figshare.com/articles/dataset/doubletroubledb_data_-_Ensembl_Plants/25222067)
+4. [Ensembl Protists](https://figshare.com/articles/dataset/doubletroubledb_data_-_Ensembl_Protists/25222070)
+5. [Ensembl](https://figshare.com/articles/dataset/doubletroubledb_data_-_Ensembl/25222076)
+
+
+```{r here}
+#| message: false
+#| eval: true
+
+library(here)
+library(tidyverse)
+library(rvest)
+library(httr)
+
+set.seed(123) # for reproducibility
+options(timeout = 1e10)
+```
+
+I opened each page on Google Chrome and did the following:
+
+1. Click on the "Next page" arrow button to see all the files (14 pages,
+thumbnail view).
+
+2. Once all pages have been shown, the Javascript-created HTML file will 
+contain data on all files. Then, we open Developer Tools, go to the Console
+tab, and run the following code:
+
+```
+copy(document.documentElement.outerHTML);
+```
+
+3. This code will copy the content of the HTML page in the clipboard. Then,
+we can paste the text in the clipboard to an empty file with an `.html`
+extension (e.g., `figshare_fungi.html`).
+
+Then, we can read the file and scrape the relevant information.
+
+```{r}
+# Define function to get a data frame of URL, filename, and species
+scrape_figshare <- function(html_path) {
+    
+    page <- read_html(html_path)
+    file_divs <- page |>
+        html_elements("div.Oom-6") 
+    
+    # Create a a vector of file names
+    file_names <- unlist(lapply(file_divs, function(x) {
+        
+        fn <- x |>
+            html_elements("span") |>
+            html_attr("title")
+        fn <- fn[!is.na(fn)]
+        
+        return(fn)
+    }))
+    
+    # Create a vector of URLs
+    file_urls <- unlist(lapply(file_divs, function(x) {
+        
+        furl <- x |>
+            html_elements("a") |>
+            html_attr("href")
+        furl <- furl[!is.na(furl)]
+        
+        return(furl)
+    }))
+    
+    # Combine results in a data frame
+    url_df <- data.frame(
+        url = file_urls,
+        filename = file_names
+    ) |>
+        dplyr::filter(endsWith(filename, ".zip")) |>
+        mutate(species = str_replace_all(filename, ".zip", ""))
+    
+    return(url_df)
+}
+
+
+
+# Read files
+fungi <- scrape_figshare("~/Downloads/figshare_fungi.html") |> 
+    mutate(ensembl = "Fungi")
+
+plants <- scrape_figshare("~/Downloads/figshare_plants.html") |> 
+    mutate(ensembl = "Plants")
+
+metazoa <- scrape_figshare("~/Downloads/figshare_metazoa.html") |> 
+    mutate(ensembl = "Metazoa")
+
+vertebrates <- scrape_figshare("~/Downloads/figshare_vertebrates.html") |> 
+    mutate(ensembl = "Vertebrates")
+
+protists <- scrape_figshare("~/Downloads/figshare_protists.html") |> 
+    mutate(ensembl = "Protists")
+
+# Create object
+urls <- rbind(fungi, plants, protists, metazoa, vertebrates)
+
+save(
+    urls, compress = "xz",
+    file = here::here("data", "urls.rda")
+)
+```
+
+
+## Session info {.unnumbered}
+
+This document was created under the following conditions:
+
+```{r sessioninfo}
+#| eval: true
+#| echo: false
+sessioninfo::session_info()
+```
+
+## References {.unnumbered}

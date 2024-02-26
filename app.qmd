@@ -1,0 +1,414 @@
+---
+title: "doubletroubledb"
+format: 
+  dashboard:
+      logo: images/doubletroubledb_logo.png
+      favicon: images/doubletroubledb_logo.png
+include-in-header:
+  - text: |
+      <link rel = "shortcut icon" href = "images/doubletroubledb_logo.png" />
+---
+
+```{r}
+#| context: setup
+library(ggplot2)
+library(tidyverse)
+
+# Load data
+load(here::here("data", "metadata_all.rda"))
+load(here::here("data", "trees.rda"))
+load(here::here("data", "dup_counts.rda"))
+load(here::here("data", "urls.rda"))
+
+# Load functions
+source(here::here("R", "visualization.R"))
+```
+
+# Explore
+
+Here, you can explore the relative contribution of each duplication mode
+to the duplicated gene repertoire of all species in instances of 
+Ensembl and Ensembl Genomes.
+
+## Row {.tabset}
+
+### Plants
+
+```{r}
+#| width: 30%
+
+# Plot tree - Plants
+tree_plants <- plot_tree(
+    tree = trees$Plants, 
+    metadata = metadata_all$Plants, 
+    taxon = "order"
+) +
+    ggtree::theme_tree2() + 
+    theme(
+        axis.ticks = element_blank(), 
+        axis.line.x = element_blank(), 
+        axis.text.x = element_text(color = "white"),
+        legend.position = "none",
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
+tp <- plotly::ggplotly(tree_plants, tooltip = "label")
+for(t in seq_along(tp$x$data)) {
+    tp$x$data[[t]]$text <- gsub("tooltip: ", "", tp$x$data[[t]]$text)
+}
+
+tp
+```
+
+```{r}
+#| width: 70%
+
+# Plot barplot - Plants
+bar_plants <- dup_counts$Plants |>
+    dplyr::mutate(
+        species = factor(species, levels = rev(get_taxa_name(tree_plants)))
+    ) |>
+    group_by(species) |>
+    mutate(
+        perc = n / sum(n),
+        perc = round(perc * 100, 2)
+    ) |>
+    ungroup() |>
+    mutate(
+        text = paste0(
+            "Species: ", species, "\n",
+            "Type: ", type, "\n",
+            "N: ", n, "\n",
+            "%: ", perc
+        )
+    ) |>
+    plot_duplicate_freqs(plot_type = "stack_percent") +
+    theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    ) +
+    coord_cartesian(expand = FALSE) +
+    labs(y = NULL)
+
+bp <- plotly::ggplotly(bar_plants, tooltip = "text")
+for(t in seq_along(bp$x$data)) {
+    bp$x$data[[t]]$text <- gsub("text: ", "", bp$x$data[[t]]$text)
+}
+
+bp
+```
+
+### Vertebrates
+
+```{r}
+#| width: 30%
+
+# Plot tree - Vertebrates
+tree_vert <- plot_tree(
+    tree = trees$Vertebrates, 
+    metadata = metadata_all$Vertebrates, 
+    taxon = "class"
+) +
+    ggtree::theme_tree2() + 
+    theme(
+        axis.ticks = element_blank(), 
+        axis.line.x = element_blank(), 
+        axis.text.x = element_text(color = "white"),
+        legend.position = "none",
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
+tv <- plotly::ggplotly(tree_vert, tooltip = "label")
+for(t in seq_along(tv$x$data)) {
+    tv$x$data[[t]]$text <- gsub("tooltip: ", "", tv$x$data[[t]]$text)
+}
+
+tv
+```
+
+```{r}
+#| width: 70%
+
+bar_vert <- dup_counts$Vertebrates |>
+    dplyr::mutate(
+        species = factor(species, levels = rev(get_taxa_name(tree_vert)))
+    ) |>
+    group_by(species) |>
+    mutate(
+        perc = n / sum(n),
+        perc = round(perc * 100, 2)
+    ) |>
+    ungroup() |>
+    mutate(
+        text = paste0(
+            "Species: ", species, "\n",
+            "Type: ", type, "\n",
+            "N: ", n, "\n",
+            "%: ", perc
+        )
+    ) |>
+    plot_duplicate_freqs(plot_type = "stack_percent") +
+    theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    ) +
+    coord_cartesian(expand = FALSE) +
+    labs(y = NULL)
+
+bv <- plotly::ggplotly(bar_vert, tooltip = "text")
+for(t in seq_along(bv$x$data)) {
+    bv$x$data[[t]]$text <- gsub("text: ", "", bv$x$data[[t]]$text)
+}
+
+bv
+```
+
+### Metazoa
+
+```{r}
+#| width: 30%
+
+# Plot tree - Vertebrates
+tree_mz <- plot_tree(
+    tree = trees$Metazoa, 
+    metadata = metadata_all$Metazoa, 
+    taxon = "phylum"
+) +
+    ggtree::theme_tree2() + 
+    theme(
+        axis.ticks = element_blank(), 
+        axis.line.x = element_blank(), 
+        axis.text.x = element_text(color = "white"),
+        legend.position = "none",
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
+tm <- plotly::ggplotly(tree_mz, tooltip = "label")
+for(t in seq_along(tm$x$data)) {
+    tm$x$data[[t]]$text <- gsub("tooltip: ", "", tm$x$data[[t]]$text)
+}
+
+tm
+```
+
+```{r}
+#| width: 70%
+
+# Create barplot
+bar_mz <- dup_counts$Metazoa |>
+    dplyr::mutate(
+        species = factor(species, levels = rev(get_taxa_name(tree_mz)))
+    ) |>
+    group_by(species) |>
+    mutate(
+        perc = n / sum(n),
+        perc = round(perc * 100, 2)
+    ) |>
+    ungroup() |>
+    mutate(
+        text = paste0(
+            "Species: ", species, "\n",
+            "Type: ", type, "\n",
+            "N: ", n, "\n",
+            "%: ", perc
+        )
+    ) |>
+    plot_duplicate_freqs(plot_type = "stack_percent") +
+    theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    ) +
+    coord_cartesian(expand = FALSE) +
+    labs(y = NULL)
+
+bmz <- plotly::ggplotly(bar_mz, tooltip = "text")
+for(t in seq_along(bmz$x$data)) {
+    bmz$x$data[[t]]$text <- gsub("text: ", "", bmz$x$data[[t]]$text)
+}
+
+bmz
+```
+
+
+### Fungi
+
+```{r}
+#| width: 30%
+
+# Plot tree - Fungi
+tree_f <- plot_tree(
+    tree = trees$Fungi, 
+    metadata = metadata_all$Fungi, 
+    taxon = "phylum"
+) +
+    ggtree::theme_tree2() + 
+    theme(
+        axis.ticks = element_blank(), 
+        axis.line.x = element_blank(), 
+        axis.text.x = element_text(color = "white"),
+        legend.position = "none",
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
+tf <- plotly::ggplotly(tree_f, tooltip = "label")
+for(t in seq_along(tf$x$data)) {
+    tf$x$data[[t]]$text <- gsub("tooltip: ", "", tf$x$data[[t]]$text)
+}
+
+tf
+```
+
+```{r}
+#| width: 70%
+
+# Create barplot
+bar_f <- dup_counts$Fungi |>
+    dplyr::mutate(
+        species = factor(species, levels = rev(get_taxa_name(tree_f)))
+    ) |>
+    group_by(species) |>
+    mutate(
+        perc = n / sum(n),
+        perc = round(perc * 100, 2)
+    ) |>
+    ungroup() |>
+    mutate(
+        text = paste0(
+            "Species: ", species, "\n",
+            "Type: ", type, "\n",
+            "N: ", n, "\n",
+            "%: ", perc
+        )
+    ) |>
+    plot_duplicate_freqs(plot_type = "stack_percent") +
+    theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    ) +
+    coord_cartesian(expand = FALSE) +
+    labs(y = NULL)
+
+bf <- plotly::ggplotly(bar_f, tooltip = "text")
+for(t in seq_along(bf$x$data)) {
+    bf$x$data[[t]]$text <- gsub("text: ", "", bf$x$data[[t]]$text)
+}
+
+bf
+```
+
+### Protists
+
+```{r}
+#| width: 30%
+
+# Plot tree - Fungi
+tree_p <- plot_tree(
+    tree = trees$Protists, 
+    metadata = metadata_all$Protists, 
+    taxon = "phylum"
+) +
+    ggtree::theme_tree2() + 
+    theme(
+        axis.ticks = element_blank(), 
+        axis.line.x = element_blank(), 
+        axis.text.x = element_text(color = "white"),
+        legend.position = "none",
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
+tp <- plotly::ggplotly(tree_p, tooltip = "label")
+for(t in seq_along(tp$x$data)) {
+    tp$x$data[[t]]$text <- gsub("tooltip: ", "", tp$x$data[[t]]$text)
+}
+
+tp
+```
+
+```{r}
+#| width: 70%
+
+# Create barplot
+bar_p <- dup_counts$Protists |>
+    dplyr::mutate(
+        species = factor(species, levels = rev(get_taxa_name(tree_p)))
+    ) |>
+    group_by(species) |>
+    mutate(
+        perc = n / sum(n),
+        perc = round(perc * 100, 2)
+    ) |>
+    ungroup() |>
+    mutate(
+        text = paste0(
+            "Species: ", species, "\n",
+            "Type: ", type, "\n",
+            "N: ", n, "\n",
+            "%: ", perc
+        )
+    ) |>
+    plot_duplicate_freqs(plot_type = "stack_percent") +
+    theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin = margin(0, 0, 0, 0, "cm")
+    ) +
+    coord_cartesian(expand = FALSE) +
+    labs(y = NULL)
+
+bp <- plotly::ggplotly(bar_p, tooltip = "text")
+for(t in seq_along(bp$x$data)) {
+    bp$x$data[[t]]$text <- gsub("text: ", "", bp$x$data[[t]]$text)
+}
+
+bp
+```
+
+# Download
+
+Use the column filters and search bar to find your species of interest. Then,
+click the species name to download a list of all duplicate pairs
+and duplicated genes.
+
+```{r}
+# Reduce list of data frames to a single data frame
+dmetadata <- dplyr::bind_rows(metadata_all, .id = "Ensembl") |>
+    inner_join(urls, by = "species") |>
+    mutate(
+        species_name = paste0(
+            "<a href='", url, "' target='_blank'>", ncbi_species, "</a>"
+        )
+    )
+
+# Keep only useful columns
+cols <- c(
+    Species = "species_name", TaxID = "taxonomy_id",
+    Assembly = "assembly", Accession = "assembly_accession",
+    Family = "family", Order = "order", Class = "class", 
+    Phylum = "phylum"
+)
+final_table <- dmetadata[, cols]
+names(final_table) <- names(cols)
+final_table$TaxID <- as.character(final_table$TaxID)
+
+
+# Create DataTable
+dt <- DT::datatable(
+    final_table,
+    selection = 'single',
+    rownames = FALSE,
+    filter = 'top',
+    escape = FALSE,
+    options = list(
+        lengthMenu = c(5, 10, 25, 50, 100), 
+        pageLength = 10
+    )
+)
+
+dt
+```
+
+
