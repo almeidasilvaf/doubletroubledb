@@ -11,8 +11,11 @@ include-in-header:
 
 ```{r}
 #| context: setup
+#| message: false
+#| warning: false
 library(ggplot2)
 library(tidyverse)
+library(ggtree)
 
 # Load data
 load(here::here("data", "metadata_all.rda"))
