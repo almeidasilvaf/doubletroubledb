@@ -31,7 +31,7 @@ source(here::here("R", "visualization.R"))
 
 Here, you can explore the relative contribution of each duplication mode
 to the duplicated gene repertoire of all species in instances of 
-Ensembl and Ensembl Genomes.
+Ensembl (release 110) and Ensembl Genomes (release 57).
 
 ## Row {.tabset}
 
