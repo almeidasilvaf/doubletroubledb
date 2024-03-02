@@ -414,4 +414,100 @@ dt <- DT::datatable(
 dt
 ```
 
+# FAQ
+
+::: {.callout-note icon="false"}
+
+## 1) How do I cite this resource?
+
+To cite `doubletroubledb` in publications, use:
+
+> Almeida-Silva, F., & de Peer, Y. V. (2024). doubletrouble: an R/Bioconductor package for the identification, classification, and analysis of gene and genome duplications. BioRxiv. https://doi.org/10.1101/2024.02.27.582236
+
+
+A BibTeX entry for LaTeX users is:
+
+```
+ @article{Almeida-Silva2024.02.27.582236,
+	author = {Fabricio Almeida-Silva and Yves Van de Peer},
+	title = {doubletrouble: an R/Bioconductor package for the identification, classification, and analysis of gene and genome duplications},
+	year = {2024},
+	doi = {10.1101/2024.02.27.582236},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2024/02/29/2024.02.27.582236},
+	journal = {bioRxiv}
+}
+```
+
+:::
+
+---
+
+::: {.callout-note icon="false"}
+
+## 2) How do I report an issue or suggest a feature?
+
+You can open an issue in the [GitHub repository](https://github.com/almeidasilvaf/doubletroubledb) 
+where the source code for this app is.
+
+:::
+
+---
+
+::: {.callout-note icon="false"}
+
+## 3) Where can I find the code used to create the data in this resource?
+
+All data in this resource (duplicate pairs, duplicated genes, 
+and .collinearity files) were generated for a benchmark in 
+[the paper associated with this app](https://doi.org/10.1101/2024.02.27.582236).
+All code used in this paper are available in the pages below:
+
+1. GitHub repository: <https://github.com/almeidasilvaf/doubletrouble_paper>.
+2. Quarto book: <https://almeidasilvaf.github.io/doubletrouble_paper/>.
+
+:::
+
+---
+
+::: {.callout-note icon="false"}
+
+## 4) The tree topology is not 100% accurate in a specific species tree. Why is that?
+
+Since Ensembl doesn't provide species trees for all its instances, we
+inferred a species tree using a standard approach in phylogenomics.
+The following fragment was extracted from the manuscript associated
+with this publication:
+
+> BUSCO scores (Manni et al. 2021) for each species were obtained and 
+visualized using the Bioconductor package 
+cogeqc (Almeida‐Silva and Van de Peer 2023). BUSCO genes shared by >90% of 
+the species were aligned with MAFFT (Katoh and Standley 2013), and 
+multiple sequence alignments were concatenated and trimmed to remove 
+alignment columns with >50% gaps. Filtered supermatrices were used for 
+phylogeny inference with IQ-TREE2 (Minh et al. 2020). Oomycetes, red algae, 
+*Giardia lamblia*, *Mnemiopsis leidyi*, and
+*Saccharomyces cerevisiae* were used as outgroups for Ensembl Fungi, Ensembl
+Plants, Ensembl Protists, Ensembl Metazoa, and Ensembl, respectively.
+
+
+Although inferring trees from BUSCO genes is common practice, this method
+has limitations and can lead to wrong topologies. Our goal here was not
+test hypotheses on the phylogeny of each Ensembl instance (with more
+sophisticated methods such as partition models, microsynteny-based phylogenies,
+and gene tree-species tree reconciliation methods, for instance). Instead,
+we simply wanted to have species trees that could be used as a phylogenetic
+context to explore major patterns in the frequency of duplicated genes
+by mode.
+
+
+If you have a curated species tree that includes all species in one (or more)
+of the Ensembl instances used here, we'd be happy to update the tree in this
+app. You can contribute data by opening an issue in
+[this GitHub repo](https://github.com/almeidasilvaf/doubletroubledb).
+
+:::
+
+
+
 
