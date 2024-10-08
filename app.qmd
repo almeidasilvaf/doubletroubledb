@@ -31,7 +31,12 @@ source(here::here("R", "visualization.R"))
 
 Here, you can explore the relative contribution of each duplication mode
 to the duplicated gene repertoire of all species in instances of 
-Ensembl (release 110) and Ensembl Genomes (release 57).
+
+Ensembl (release 110) and Ensembl Genomes (release 57). 
+Duplication modes
+include segmental (**SD**), tandem (**TD**), proximal (**PD**), 
+retrotransposed (**rTRD**), transposed (**TRD**), and dispersed (**DD**) 
+duplications.
 
 ## Row {.tabset}
 
